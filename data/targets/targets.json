@@ -1,0 +1,136 @@
+{
+  "T1206": {
+    "type": "protein-protein homodimer",
+    "stoich": "A2",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A",
+          "B"
+        ],
+        "sequence": "MGGPTTDPVQIYSPSLFGEPALYGSTATIGQRVPVAAVCMQAVGGAQKVYTYSLRELLDPVFVQNGNIIDITVIDLPTYPIYQKDGSDYSPIGDVYAAHFTTIGSSRPVQWTTVLWRANISKQIRLRGHATPTDQFLFFNPQLSMSGSNLPTTTYGLTVSSLVSLTERQEEINAGKWYLSTFVAFNGRREFDNYGIPFYLSLQQIDTQQGNYEPTTEAYNVGAMLNTATPLKLHLNA"
+      }
+    ]
+  },
+  "H1215": {
+    "type": "protein-protein heterodimer",
+    "stoich": "A1B1",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A"
+        ],
+        "sequence": "SGEVQLLESGGGLVQAGGSLRLSCAASDRTFSSYAVGWFRQAPGREREFVAATSWRGDSTYYADSVKGRFTISRDNAKNTVHLQMNSLKPEDTAVYYCAAKWGPVPTNSVMNYYTREYDYWGQGTQVTVSS",
+        "note": "nanobody"
+      },
+      {
+        "type": "protein",
+        "ids": [
+          "B"
+        ],
+        "sequence": "SGMVSKGEEDNMASLPATHELHIFGSINGVDFDMVGQGTGNPNDGYEELNLKSTKGDLQFSPWILVPHIGYGFHQYLPYPDGMSPFQAAMVDGSGYQVHRTMQFEDGASLTVNYRYTYEGSHIKGEAQVKGTGFPADGPVMTNSLTAADWCRSKKTYPNDKTIISTFKWSYTTGNGKRYRSTARTTYTFAKPMAANYLKNQPMYVFRKTELKHSKTELNFKEWQKAFTDVMGMDELYK",
+        "note": "mNeonGreen"
+      }
+    ]
+  },
+  "M1211": {
+    "type": "protein-RNA",
+    "stoich": "A2R1",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A",
+          "B"
+        ],
+        "sequence": "MGPAFEFAVAMMKRNSSTVKTEYGEFTMLGIYDRWAVLPRHAKPGPTILMNDQEVGVLDAKELVDKDGTNLELTLLKLNRNEKFRDIRGFLAKEEVEVNEAVLAINTSKFPNMYIPVGQVTEYGFLNLGGTPTKRMLMYNFPTRAGQAGGVLMSTGKVLGIHVGGNGHQGFSAALLKHYFNDEQLEHHHHHH"
+      },
+      {
+        "type": "rna",
+        "ids": [
+          "C"
+        ],
+        "sequence": "GGUAAAACAGCCUGUGGGUUGAUCCCACCCACAGGGCCCAUUGGGCGCUAGCACUCUGGUAUCACGGUACCUUUGUGCGCCUGUUUUACC"
+      }
+    ]
+  },
+  "R1211": {
+    "type": "RNA",
+    "stoich": "A1",
+    "chains": [
+      {
+        "type": "rna",
+        "ids": [
+          "A"
+        ],
+        "sequence": "GGUAAAACAGCCUGUGGGUUGAUCCCACCCACAGGGCCCAUUGGGCGCUAGCACUCUGGUAUCACGGUACCUUUGUGCGCCUGUUUUACC"
+      }
+    ]
+  },
+  "M1276": {
+    "type": "protein-DNA",
+    "stoich": "A1B1",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A"
+        ],
+        "sequence": "GHMAMGFKDKQKALDTLKILDGRDVSYQYHVIMSFVSRAKRTLQITRDEEKLANLRDALKTFEDWLVDYKENNRSKENLAYLSLETIKAFRSLAKKYDVWDEEFFNAYKDEKGDYKGLRAVKVPGKDVTWDIERNRRLKEIVGRIKQEYIQWYETDVGDFRGFPTKEHAQCIVLAYSPDPMKLRKLASQARDRFGG"
+      },
+      {
+        "type": "dna",
+        "ids": [
+          "B"
+        ],
+        "sequence": "GAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTC"
+      }
+    ]
+  },
+  "L1002": {
+    "type": "protein-ligand",
+    "stoich": "A1",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A"
+        ],
+        "sequence": "IIGGTESKPHSRPYMAYLEIVTSNGPSKFCGGFLIRRNFVLTAAHCAGRSITVTLGAHNITEEEDTWQKLEVIKQFRHPKYNTSTLHHDIMLLKLKEKASLTLAVGTLPFPSQKNFVPPGRMCRVAGWGRTGVLKPGSDTLQEVKLRLMDPQACSHFRDFDHNLQLCVGNPRKTKSAFKGDSGGPLLCAGVAQGIVSYGRSDAKPPAVFTRISHYRPWINQILQAN",
+        "note": "chymase, mature chain from IIGG (precursor 247 aa from CASP L1000 page)"
+      },
+      {
+        "type": "ligand",
+        "ids": [
+          "L"
+        ],
+        "smiles": "CCc1ccc2c(CCNC(C)=O)c([C@@H](C3=C(O)[C@@H](c4ccccc4)CC3=O)c3ccccc3)[nH]c2c1",
+        "ligand_name": "293"
+      }
+    ]
+  },
+  "L2001": {
+    "type": "protein-ligand",
+    "stoich": "A1",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A"
+        ],
+        "sequence": "IIGGRESRPHSRPYMAYLQIQSPAGQSRCGGFLVREDFVLTAAHCWGSNINVTLGAHNIQRRENTQQHITARRAIRHPQYNQRTIQNDIMLLQLSRRVRRNRNVNPVALPRAQEGLRPGTLCTVAGWGRVSMRRGTDTLREVQLRVQRDRQCLRIFGSYDPRRQICVGDRRERKAAFKGDSGGPLLCNNVAHGIVSYGKSSGVPPEVFTRVSSFLPWIRTTMRSFKLLDQMETPL",
+        "note": "cathepsin G, mature chain from IIGG (precursor 255 aa from CASP L2000 page)"
+      },
+      {
+        "type": "ligand",
+        "ids": [
+          "L"
+        ],
+        "smiles": "CC(=O)NCCc1c([C@@H](C2=C(O)[C@@](C)(c3ccccc3)OC2=O)c2ccccc2)[nH]c2cc(F)ccc12",
+        "ligand_name": "761"
+      }
+    ]
+  }
+}

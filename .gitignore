@@ -1,0 +1,5 @@
+predictions/
+logs/
+*.tgz
+*.tar.gz
+__pycache__/
