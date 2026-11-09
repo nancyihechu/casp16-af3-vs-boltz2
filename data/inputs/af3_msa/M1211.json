@@ -1,0 +1,26 @@
+{
+  "name": "M1211",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "protein": {
+        "id": [
+          "A",
+          "B"
+        ],
+        "sequence": "MGPAFEFAVAMMKRNSSTVKTEYGEFTMLGIYDRWAVLPRHAKPGPTILMNDQEVGVLDAKELVDKDGTNLELTLLKLNRNEKFRDIRGFLAKEEVEVNEAVLAINTSKFPNMYIPVGQVTEYGFLNLGGTPTKRMLMYNFPTRAGQAGGVLMSTGKVLGIHVGGNGHQGFSAALLKHYFNDEQLEHHHHHH",
+        "templates": []
+      }
+    },
+    {
+      "rna": {
+        "id": "C",
+        "sequence": "GGUAAAACAGCCUGUGGGUUGAUCCCACCCACAGGGCCCAUUGGGCGCUAGCACUCUGGUAUCACGGUACCUUUGUGCGCCUGUUUUACC"
+      }
+    }
+  ]
+}

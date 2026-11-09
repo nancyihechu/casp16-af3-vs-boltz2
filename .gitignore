@@ -3,3 +3,8 @@ logs/
 *.tgz
 *.tar.gz
 __pycache__/
+msas/
+*-pastedcontent-*.txt
+# Per-seed AF3 JSONs embed full MSAs (~25 MB each, ~306 MB total). Regenerate with:
+#   python3 -I scripts/make_inputs.py seeds   (needs msas/, which is also ignored)
+data/inputs/af3/

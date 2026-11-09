@@ -1,0 +1,19 @@
+target,method,entity,chain_or_file,unpaired_seqs,paired_seqs
+H1215,af3,protein,A,10678,24703
+H1215,af3,protein,B,410,550
+L1002,af3,protein,A,19065,50000
+L2001,af3,protein,A,19067,50000
+M1211,af3,protein,"['A', 'B']",548,9139
+M1211,af3,rna,C,99,
+M1276,af3,protein,A,513,325
+R1211,af3,rna,A,99,
+T1206,af3,protein,"['A', 'B']",45,50
+H1215,boltz2,protein,H1215_0,11222,19
+H1215,boltz2,protein,H1215_1,264,19
+L1002,boltz2,protein,L1002_0,13293,0
+L2001,boltz2,protein,L2001_0,14757,0
+M1211,boltz2,protein,M1211_0,948,0
+M1276,boltz2,protein,M1276_0,1077,0
+T1206,boltz2,protein,T1206_0,76,0
+T1206,af2m,protein(all chains),a3m,77,(in a3m)
+H1215,af2m,protein(all chains),a3m,12783,(in a3m)

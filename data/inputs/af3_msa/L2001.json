@@ -1,0 +1,23 @@
+{
+  "name": "L2001",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "protein": {
+        "id": "A",
+        "sequence": "IIGGRESRPHSRPYMAYLQIQSPAGQSRCGGFLVREDFVLTAAHCWGSNINVTLGAHNIQRRENTQQHITARRAIRHPQYNQRTIQNDIMLLQLSRRVRRNRNVNPVALPRAQEGLRPGTLCTVAGWGRVSMRRGTDTLREVQLRVQRDRQCLRIFGSYDPRRQICVGDRRERKAAFKGDSGGPLLCNNVAHGIVSYGKSSGVPPEVFTRVSSFLPWIRTTMRSFKLLDQMETPL",
+        "templates": []
+      }
+    },
+    {
+      "ligand": {
+        "id": "L",
+        "smiles": "CC(=O)NCCc1c([C@@H](C2=C(O)[C@@](C)(c3ccccc3)OC2=O)c2ccccc2)[nH]c2cc(F)ccc12"
+      }
+    }
+  ]
+}

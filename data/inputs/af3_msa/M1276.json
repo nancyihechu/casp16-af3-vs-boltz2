@@ -1,0 +1,23 @@
+{
+  "name": "M1276",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "protein": {
+        "id": "A",
+        "sequence": "GHMAMGFKDKQKALDTLKILDGRDVSYQYHVIMSFVSRAKRTLQITRDEEKLANLRDALKTFEDWLVDYKENNRSKENLAYLSLETIKAFRSLAKKYDVWDEEFFNAYKDEKGDYKGLRAVKVPGKDVTWDIERNRRLKEIVGRIKQEYIQWYETDVGDFRGFPTKEHAQCIVLAYSPDPMKLRKLASQARDRFGG",
+        "templates": []
+      }
+    },
+    {
+      "dna": {
+        "id": "B",
+        "sequence": "GAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTC"
+      }
+    }
+  ]
+}

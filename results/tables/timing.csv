@@ -1,0 +1,17 @@
+target,method,seed,msa_source,msa_s,msa_s_scope,inference_s,inference_s_definition,run_wall_s,run_rc,gpu
+H1215,af2m,1,colabfold_server_mixed,37.4,per_target_once,429.2,per_seed_run_wall_msa_cached,429.2,0,L40S
+H1215,af3,1,af3_local_jackhmmer,1605.62,per_target_once,51.6,af3_model_inference_log,70.9,0,L40S
+H1215,boltz2,1,colabfold_server_cached,1.9,per_target_once,316.2,per_seed_run_wall_msa_cached,316.2,0,L40S
+L1002,af3,1,af3_local_jackhmmer,871.71,per_target_once,53.41,af3_model_inference_log,73.5,0,L40S
+L1002,boltz2,1,colabfold_server_cached,1.6,per_target_once,289.6,per_seed_run_wall_msa_cached,289.6,0,L40S
+L2001,af3,1,af3_local_jackhmmer,870.35,per_target_once,51.97,af3_model_inference_log,70.2,0,L40S
+L2001,boltz2,1,colabfold_server_cached,1.7,per_target_once,52.5,per_seed_run_wall_msa_cached,52.5,0,L40S
+M1211,af3,1,af3_local_jackhmmer,1472.98,per_target_once,52.09,af3_model_inference_log,73.6,0,L40S
+M1211,boltz2,1,colabfold_server_cached,0.9,per_target_once,315.4,per_seed_run_wall_msa_cached,315.4,0,L40S
+M1276,af3,1,af3_local_jackhmmer,656.64,per_target_once,40.59,af3_model_inference_log,74.5,0,L40S
+M1276,boltz2,1,colabfold_server_cached,1.0,per_target_once,282.4,per_seed_run_wall_msa_cached,282.4,0,L40S
+R1211,af3,1,af3_local_jackhmmer,305.93,per_target_once,40.73,af3_model_inference_log,72.0,0,L40S
+R1211,boltz2,1,none,0,per_target_once,274.4,per_seed_run_wall_msa_cached,274.4,0,L40S
+T1206,af2m,1,colabfold_server_cached,170.8,per_target_once,231.7,per_seed_run_wall_msa_cached,231.7,0,L40S
+T1206,af3,1,af3_local_jackhmmer,714.96,per_target_once,56.06,af3_model_inference_log,91.9,0,L40S
+T1206,boltz2,1,colabfold_server_cached,0.8,per_target_once,321.7,per_seed_run_wall_msa_cached,321.7,0,L40S

@@ -1,0 +1,23 @@
+{
+  "name": "L1002",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "protein": {
+        "id": "A",
+        "sequence": "IIGGTESKPHSRPYMAYLEIVTSNGPSKFCGGFLIRRNFVLTAAHCAGRSITVTLGAHNITEEEDTWQKLEVIKQFRHPKYNTSTLHHDIMLLKLKEKASLTLAVGTLPFPSQKNFVPPGRMCRVAGWGRTGVLKPGSDTLQEVKLRLMDPQACSHFRDFDHNLQLCVGNPRKTKSAFKGDSGGPLLCAGVAQGIVSYGRSDAKPPAVFTRISHYRPWINQILQAN",
+        "templates": []
+      }
+    },
+    {
+      "ligand": {
+        "id": "L",
+        "smiles": "CCc1ccc2c(CCNC(C)=O)c([C@@H](C3=C(O)[C@@H](c4ccccc4)CC3=O)c3ccccc3)[nH]c2c1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "R1211",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "rna": {
+        "id": "A",
+        "sequence": "GGUAAAACAGCCUGUGGGUUGAUCCCACCCACAGGGCCCAUUGGGCGCUAGCACUCUGGUAUCACGGUACCUUUGUGCGCCUGUUUUACC"
+      }
+    }
+  ]
+}
