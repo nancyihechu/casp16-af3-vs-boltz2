@@ -103,6 +103,32 @@ Recon: `../PROJECT4_RECON.md`
   `singularity exec ../containers/ost.sif ost compare-structures | compare-ligand-structures` (OST 2.12.0).
   Install standalone DockQ only if OST cannot cover a case.
 
+## Exact tool versions used (all runs 2026-11-09, L40S, driver 610.57)
+| Tool | Version |
+|---|---|
+| AlphaFold3 | DeepMind container `alphafold3_301.sif`, git `v3.0.1-13-ga3cf058`, weights `af3.bin` |
+| Boltz-2 | boltz 2.2.1 `[cuda]`, torch 2.14.1+cu126, cuequivariance(-torch/-ops-cu12) 0.13.0 |
+| AF2-Multimer | ColabFold 1.5.5, alphafold-colabfold 2.3.6, jax/jaxlib 0.4.34, `alphafold2_multimer_v3` params |
+| MSA (Boltz, ColabFold) | public ColabFold MMseqs2 server `api.colabfold.com`, 2026-11-09 |
+| OpenStructure | 2.12.0 (`containers/ost.sif`): compare-structures, compare-ligand-structures |
+| USalign | 20241108 (`envs/p3_tools`) |
+| PoseBusters | 0.6.5, `dock` mode |
+| RDKit (scoring) | 2026.09.1 |
+| Biopython | 1.88 |
+
+## Stage D scoring conventions
+- Pipeline: `scripts/score_prep.py` → `scripts/score_tasks.py <workers>` → `scripts/score_parse.py`. Raw outputs are in `predictions/scoring_work/out/`.
+- Ligand SDFs (both model and reference) take connectivity from coordinates and bond orders from the **official SMILES**. Each one is checked by InChI key against the SMILES.
+  Radical flags left over from the conversion are cleared; otherwise PoseBusters would report them as a model error.
+- PoseBusters runs in `dock` mode, using the model's own protein. Its redock `rmsd_≤_2Å` check cannot be used, because model and reference sit in different frames. RMSD = OST BiSyRMSD only.
+- Ligand success = BiSyRMSD < 2 Å AND every PoseBusters check passed.
+- L2001 is scored against reference chain A, the chain closest to ligand 761 (2.6 Å). Chain B is 6.1 Å away, a crystal contact.
+- Protein–NA headline = mean DockQ over protein–nucleic-acid interfaces only (`dockq_protein_na_mean`). Native NA chain id = `0`.
+- **M1211 RNA scored alone:** `rna_only_tm_score` / `rna_only_lddt` (model chain C vs native chain 0, OST `--lddt --tm-score`, the same as R1211).
+  The R1211 native and the M1211 native RNA chain are the same coordinates (USalign TM 1.000, RMSD 0.00, 90 nt, 1904 atoms),
+  so `results/tables/rna_alone_vs_complex.csv` isolates the effect of context.
+- `results/tables/summary.csv` gives per target × method: mean, median, top-ranked (by the method's own ranking_score / confidence_score) and best-of-25.
+
 ## Cluster
 - Conda: `module load miniconda3/v26.7.1-1_py314; eval "$(conda shell.bash hook)"`. Always use `-c conda-forge --override-channels`.
 - Slurm: `--account=dkhf3-lab --partition=dkhf3-lab-gpu --gres=gpu:L40S:1`

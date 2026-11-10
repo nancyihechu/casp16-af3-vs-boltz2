@@ -1,0 +1,9 @@
+method,metric,context,n,mean,median,best_of_25
+af3,lddt,alone (R1211),25,0.665,0.656,0.701
+af3,lddt,in complex (M1211 chain C),25,0.684,0.688,0.716
+af3,tm_score,alone (R1211),25,0.436,0.443,0.486
+af3,tm_score,in complex (M1211 chain C),25,0.465,0.463,0.511
+boltz2,lddt,alone (R1211),25,0.717,0.71,0.765
+boltz2,lddt,in complex (M1211 chain C),25,0.685,0.679,0.753
+boltz2,tm_score,alone (R1211),25,0.622,0.633,0.697
+boltz2,tm_score,in complex (M1211 chain C),25,0.51,0.558,0.654

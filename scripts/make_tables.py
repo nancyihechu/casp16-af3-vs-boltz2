@@ -15,8 +15,12 @@ timing.csv: one row per (target, method, seed) run.
   !! AF3 msa_s and ColabFold-server msa_s are NOT comparable. Never plot them side by side. !!
   inference_s definition differs by method (column inference_s_definition):
     af3:    AF3's own "Running model inference with seed N took" (excludes container start, featurisation, I/O)
-    boltz2, af2m: wall time of the per-seed run with the MSA cached (includes model load and I/O)
-  run_wall_s: the whole per-seed Slurm step, for every method.
+    boltz2: wall time of the per-seed run with the MSA cached (includes model load and I/O)
+    af2m:   sum of ColabFold's per-model "took Xs" lines for that seed (5 models; excludes startup/I/O)
+  run_wall_s: the whole Slurm job. For af2m Stage C one job ran 4 seeds (seeds_in_job=4), so
+    run_wall_s there covers 4 seeds; do not read it as per-seed.
+  stage: B_cold_start (seed 1; Boltz seed-1 runs except L2001 include one-time kernel compile)
+         or C_steady_state (seeds 2-5; warm caches). Use C for steady-state timing.
 
 confidence.csv: long format: target, method, seed, sample, metric, value.
 """
@@ -48,7 +52,7 @@ def msa_source(t, m):
 
 
 INF_DEF = {"af3": "af3_model_inference_log", "boltz2": "per_seed_run_wall_msa_cached",
-           "af2m": "per_seed_run_wall_msa_cached"}
+           "af2m": "colabfold_sum_of_5_model_took_lines"}
 
 rows = list(csv.DictReader(open(T / "manifest.csv")))
 runs = {}
@@ -57,11 +61,12 @@ for r in rows:
     runs.setdefault(k, r)
 with open(T / "timing.csv", "w", newline="") as f:
     w = csv.writer(f)
-    w.writerow(["target", "method", "seed", "msa_source", "msa_s", "msa_s_scope", "inference_s",
-                "inference_s_definition", "run_wall_s", "run_rc", "gpu"])
+    w.writerow(["target", "method", "seed", "stage", "msa_source", "msa_s", "msa_s_scope", "inference_s",
+                "inference_s_definition", "run_wall_s", "seeds_in_job", "run_rc", "gpu"])
     for (t, m, s), r in sorted(runs.items()):
-        w.writerow([t, m, s, msa_source(t, m), r["msa_s"], "per_target_once", r["run_inference_s"],
-                    INF_DEF[m], r["run_wall_s"], r["run_rc"], "L40S"])
+        stage = "B_cold_start" if s == "1" else "C_steady_state"
+        w.writerow([t, m, s, stage, msa_source(t, m), r["msa_s"], "per_target_once", r["run_inference_s"],
+                    INF_DEF[m], r["run_wall_s"], r["seeds_in_job"], r["run_rc"], "L40S"])
 
 CONF = ["ptm", "iptm", "ranking_score", "confidence_score", "plddt_mean", "complex_iplddt",
         "ligand_iptm", "protein_iptm", "has_clash", "fraction_disordered"]

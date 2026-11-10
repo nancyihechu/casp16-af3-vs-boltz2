@@ -97,17 +97,30 @@ def boltz_rows():
                        chain_pair_iptm=json.dumps(c.get("pair_chains_iptm")))
 
 
+def af2m_seed_inference(logfile):
+    """Per-seed inference = sum of ColabFold's own per-model 'took Xs' lines for that seed."""
+    out = {}
+    for line in open(logfile):
+        m = re.search(r"model_\d_seed_(\d+) took ([0-9.]+)s", line)
+        if m:
+            out[int(m.group(1))] = out.get(int(m.group(1)), 0.0) + float(m.group(2))
+    return out
+
+
 def af2m_rows():
     for d in sorted(PRED.glob("af2m/*/s*_n*")):
         t = d.parent.name
         tm = read_timing(d / "timing.tsv")
+        n_in_job = int(d.name.split("_n")[1])
+        inf = af2m_seed_inference(d / "colabfold.log")
         for js in sorted(d.glob(f"{t}_scores_rank_*_model_*_seed_*.json")):
             m = re.search(r"model_(\d)_seed_(\d+)", js.name)
             model, seed = int(m.group(1)), int(m.group(2))
             pdb = Path(str(js).replace("_scores_", "_unrelaxed_").replace(".json", ".pdb"))
             sc = json.load(open(js))
             yield dict(target=t, method="af2m", seed=seed, sample=model - 1, path=str(pdb),
-                       run_rc=tm.get("rc"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
+                       run_rc=tm.get("rc"), run_wall_s=tm.get("wall_s"), run_inference_s=round(inf[seed], 1),
+                       seeds_in_job=n_in_job,
                        chains=chains_of(str(pdb)), ptm=sc.get("ptm"), iptm=sc.get("iptm"),
                        ranking_score=round(0.8 * sc["iptm"] + 0.2 * sc["ptm"], 4),
                        plddt_mean=round(float(np.mean(sc["plddt"])), 2))
@@ -118,7 +131,8 @@ def main():
     rows = [*af3_rows(), *boltz_rows(), *af2m_rows()]
     for r in rows:
         r["msa_s"], r["msa_source"] = mt.get((r["target"], r["method"]), ("", ""))
-    cols = ["target", "method", "seed", "sample", "path", "run_rc", "run_wall_s", "run_inference_s",
+        r.setdefault("seeds_in_job", 1)
+    cols = ["target", "method", "seed", "sample", "path", "run_rc", "run_wall_s", "seeds_in_job", "run_inference_s",
             "msa_s", "msa_source", "chains", "ptm", "iptm", "ranking_score", "confidence_score",
             "plddt_mean", "complex_iplddt", "ligand_iptm", "protein_iptm", "has_clash",
             "fraction_disordered", "chain_pair_iptm"]
