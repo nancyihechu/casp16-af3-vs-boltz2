@@ -68,20 +68,26 @@ Columns:
 - *Per-seed mean range*: the mean within each seed, then the min–max across the 5 seeds.
 - Lower is better for `irmsd` and `bisyrmsd`.
 
+> **Correction (2026-11-17).** AF3's per-sample `ranking_score` is stored to 2 decimals and ties (all 25 T1206 and
+> L4001 predictions read 0.93 / 0.96). The first version of this report broke those ties by order, so AF3's
+> "top-ranked" pick was wrong for T1206, R1211, L2001 and L4001. AF3's full-precision `ranking_scores.csv` is now used.
+> Only AF3 top-ranked and ranking-loss values changed (means, medians, best-of-25 and seed ranges are unchanged);
+> notably AF3's L4001 top-ranked success is 0, not 1.
+
 ### Protein–protein
 
 | Target | Metric | Method | Mean of 25 | Top-ranked | Best of 25 | Ranking loss | Per-seed mean range (min–max) |
 |---|---|---|---|---|---|---|---|
-| T1206 | dockq (headline) | AF3 | 0.936 | 0.945 | 0.946 | 0.001 | 0.929–0.939 (range 0.010) |
+| T1206 | dockq (headline) | AF3 | 0.936 | 0.939 | 0.946 | 0.007 | 0.929–0.939 (range 0.010) |
 | T1206 | dockq (headline) | Boltz-2 | 0.863 | 0.889 | 0.891 | 0.002 | 0.854–0.869 (range 0.014) |
 | T1206 | dockq (headline) | AF2-Multimer | 0.918 | 0.930 | 0.952 | 0.022 | 0.848–0.939 (range 0.092) |
-| T1206 | fnat | AF3 | 0.899 | 0.934 | 0.934 | 0.000 | 0.880–0.911 (range 0.031) |
+| T1206 | fnat | AF3 | 0.899 | 0.918 | 0.934 | 0.016 | 0.880–0.911 (range 0.031) |
 | T1206 | fnat | Boltz-2 | 0.858 | 0.913 | 0.913 | 0.000 | 0.848–0.868 (range 0.020) |
 | T1206 | fnat | AF2-Multimer | 0.914 | 0.907 | 0.945 | 0.038 | 0.880–0.926 (range 0.046) |
-| T1206 | irmsd | AF3 | 0.457 | 0.478 | 0.419 | 0.059 | 0.441–0.466 (range 0.025) |
+| T1206 | irmsd | AF3 | 0.457 | 0.490 | 0.419 | 0.071 | 0.441–0.466 (range 0.025) |
 | T1206 | irmsd | Boltz-2 | 0.854 | 0.800 | 0.737 | 0.063 | 0.806–0.900 (range 0.094) |
 | T1206 | irmsd | AF2-Multimer | 0.637 | 0.524 | 0.439 | 0.085 | 0.502–1.108 (range 0.606) |
-| T1206 | usalign_tm_mm1 | AF3 | 0.996 | 0.995 | 0.997 | 0.001 | 0.996–0.996 (range 0.000) |
+| T1206 | usalign_tm_mm1 | AF3 | 0.996 | 0.996 | 0.997 | 0.001 | 0.996–0.996 (range 0.000) |
 | T1206 | usalign_tm_mm1 | Boltz-2 | 0.983 | 0.983 | 0.987 | 0.004 | 0.982–0.984 (range 0.002) |
 | T1206 | usalign_tm_mm1 | AF2-Multimer | 0.991 | 0.993 | 0.995 | 0.002 | 0.985–0.994 (range 0.008) |
 | H1215 | dockq (headline) | AF3 | 0.051 | 0.119 | 0.298 | 0.179 | 0.027–0.077 (range 0.050) |
@@ -126,9 +132,9 @@ Columns:
 
 | Target | Metric | Method | Mean of 25 | Top-ranked | Best of 25 | Ranking loss | Per-seed mean range (min–max) |
 |---|---|---|---|---|---|---|---|
-| R1211 | tm_score (headline) | AF3 | 0.436 | 0.418 | 0.486 | 0.068 | 0.424–0.448 (range 0.024) |
+| R1211 | tm_score (headline) | AF3 | 0.436 | 0.432 | 0.486 | 0.054 | 0.424–0.448 (range 0.024) |
 | R1211 | tm_score (headline) | Boltz-2 | 0.622 | 0.499 | 0.697 | 0.198 | 0.602–0.637 (range 0.035) |
-| R1211 | lddt | AF3 | 0.665 | 0.654 | 0.701 | 0.047 | 0.657–0.678 (range 0.021) |
+| R1211 | lddt | AF3 | 0.665 | 0.653 | 0.701 | 0.048 | 0.657–0.678 (range 0.021) |
 | R1211 | lddt | Boltz-2 | 0.717 | 0.697 | 0.765 | 0.068 | 0.706–0.723 (range 0.017) |
 | M1211 | rna_only_tm_score | AF3 | 0.465 | 0.450 | 0.511 | 0.061 | 0.446–0.493 (range 0.047) |
 | M1211 | rna_only_tm_score | Boltz-2 | 0.510 | 0.379 | 0.654 | 0.275 | 0.445–0.600 (range 0.155) |
@@ -151,23 +157,23 @@ Columns:
 | L1002 | plif_recovery | Boltz-2 | 0.745 | 0.750 | 0.875 | 0.125 | 0.725–0.775 (range 0.050) |
 | L2001 | success (headline) | AF3 | 0.680 | 1.000 | 1.000 | 0.000 | 0.400–1.000 (range 0.600) |
 | L2001 | success (headline) | Boltz-2 | 1.000 | 1.000 | 1.000 | 0.000 | 1.000–1.000 (range 0.000) |
-| L2001 | bisyrmsd | AF3 | 1.777 | 1.035 | 0.771 | 0.264 | 1.050–2.450 (range 1.399) |
+| L2001 | bisyrmsd | AF3 | 1.777 | 1.045 | 0.771 | 0.274 | 1.050–2.450 (range 1.399) |
 | L2001 | bisyrmsd | Boltz-2 | 1.319 | 1.291 | 1.237 | 0.054 | 1.307–1.331 (range 0.024) |
-| L2001 | lddt_pli | AF3 | 0.829 | 0.926 | 0.932 | 0.007 | 0.743–0.922 (range 0.179) |
+| L2001 | lddt_pli | AF3 | 0.829 | 0.922 | 0.932 | 0.010 | 0.743–0.922 (range 0.179) |
 | L2001 | lddt_pli | Boltz-2 | 0.913 | 0.915 | 0.925 | 0.010 | 0.910–0.917 (range 0.008) |
 | L2001 | pb_valid | AF3 | 0.960 | 1.000 | 1.000 | 0.000 | 0.800–1.000 (range 0.200) |
 | L2001 | pb_valid | Boltz-2 | 1.000 | 1.000 | 1.000 | 0.000 | 1.000–1.000 (range 0.000) |
-| L2001 | plif_recovery | AF3 | 0.669 | 0.778 | 0.833 | 0.056 | 0.533–0.767 (range 0.233) |
+| L2001 | plif_recovery | AF3 | 0.669 | 0.667 | 0.833 | 0.167 | 0.533–0.767 (range 0.233) |
 | L2001 | plif_recovery | Boltz-2 | 0.773 | 0.778 | 0.889 | 0.111 | 0.733–0.800 (range 0.067) |
-| L4001 | success (headline) | AF3 | 0.640 | 1.000 | 1.000 | 0.000 | 0.400–0.800 (range 0.400) |
+| L4001 | success (headline) | AF3 | 0.640 | 0.000 | 1.000 | 1.000 | 0.400–0.800 (range 0.400) |
 | L4001 | success (headline) | Boltz-2 | 0.800 | 1.000 | 1.000 | 0.000 | 0.400–1.000 (range 0.600) |
-| L4001 | bisyrmsd | AF3 | 1.961 | 1.929 | 1.896 | 0.032 | 1.942–1.977 (range 0.035) |
+| L4001 | bisyrmsd | AF3 | 1.961 | 1.958 | 1.896 | 0.062 | 1.942–1.977 (range 0.035) |
 | L4001 | bisyrmsd | Boltz-2 | 1.937 | 1.932 | 1.874 | 0.057 | 1.908–1.968 (range 0.060) |
-| L4001 | lddt_pli | AF3 | 0.760 | 0.770 | 0.789 | 0.019 | 0.755–0.766 (range 0.011) |
+| L4001 | lddt_pli | AF3 | 0.760 | 0.769 | 0.789 | 0.020 | 0.755–0.766 (range 0.011) |
 | L4001 | lddt_pli | Boltz-2 | 0.766 | 0.769 | 0.784 | 0.015 | 0.761–0.775 (range 0.014) |
 | L4001 | pb_valid | AF3 | 1.000 | 1.000 | 1.000 | 0.000 | 1.000–1.000 (range 0.000) |
 | L4001 | pb_valid | Boltz-2 | 1.000 | 1.000 | 1.000 | 0.000 | 1.000–1.000 (range 0.000) |
 | L4001 | plif_recovery | AF3 | 0.739 | 0.731 | 0.808 | 0.077 | 0.715–0.777 (range 0.061) |
 | L4001 | plif_recovery | Boltz-2 | 0.622 | 0.692 | 0.731 | 0.038 | 0.577–0.654 (range 0.077) |
-| L4001 | success_fraction_copies | AF3 | 0.760 | 1.000 | 1.000 | 0.000 | 0.700–0.800 (range 0.100) |
+| L4001 | success_fraction_copies | AF3 | 0.760 | 0.500 | 1.000 | 0.500 | 0.700–0.800 (range 0.100) |
 | L4001 | success_fraction_copies | Boltz-2 | 0.880 | 1.000 | 1.000 | 0.000 | 0.700–1.000 (range 0.300) |

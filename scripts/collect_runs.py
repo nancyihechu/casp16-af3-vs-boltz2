@@ -66,6 +66,11 @@ def af3_rows():
         t, seed = d.parent.name, int(d.name[1:])
         name = f"{t}_s{seed}".lower()
         tm = read_timing(d / f"{t}_s{seed}_timing.tsv")
+        # AF3's summary_confidences.json stores ranking_score rounded to 2 decimals, which ties
+        # (e.g. all 25 T1206 predictions = 0.93). ranking_scores.csv holds AF3's full-precision
+        # values, which are what AF3 itself ranks by; use those.
+        full = {(int(r["seed"]), int(r["sample"])): float(r["ranking_score"])
+                for r in csv.DictReader(open(d / name / "ranking_scores.csv"))}
         for sd in sorted((d / name).glob("seed-*_sample-*")):
             k = int(sd.name.split("sample-")[1])
             sc = json.load(open(sd / "summary_confidences.json"))
@@ -73,7 +78,8 @@ def af3_rows():
             yield dict(target=t, method="af3", seed=seed, sample=k, path=str(sd / "model.cif"),
                        run_rc=tm.get("rc"), run_job_id=tm.get("job_id"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
                        chains=chains_of(str(sd / "model.cif")),
-                       ptm=sc.get("ptm"), iptm=sc.get("iptm"), ranking_score=sc.get("ranking_score"),
+                       ptm=sc.get("ptm"), iptm=sc.get("iptm"), ranking_score=full[(seed, k)],
+                       ranking_score_json_rounded=sc.get("ranking_score"),
                        plddt_mean=round(float(np.mean(conf["atom_plddts"])), 2),
                        has_clash=sc.get("has_clash"), fraction_disordered=sc.get("fraction_disordered"),
                        chain_pair_iptm=json.dumps(sc.get("chain_pair_iptm")))
@@ -133,7 +139,8 @@ def main():
         r["msa_s"], r["msa_source"] = mt.get((r["target"], r["method"]), ("", ""))
         r.setdefault("seeds_in_job", 1)
     cols = ["target", "method", "seed", "sample", "path", "run_job_id", "run_rc", "run_wall_s", "seeds_in_job", "run_inference_s",
-            "msa_s", "msa_source", "chains", "ptm", "iptm", "ranking_score", "confidence_score",
+            "msa_s", "msa_source", "chains", "ptm", "iptm", "ranking_score", "ranking_score_json_rounded",
+            "confidence_score",
             "plddt_mean", "complex_iplddt", "ligand_iptm", "protein_iptm", "has_clash",
             "fraction_disordered", "chain_pair_iptm"]
     out = ROOT / "results/tables/manifest.csv"

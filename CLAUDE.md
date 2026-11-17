@@ -140,6 +140,10 @@ Recon: `../PROJECT4_RECON.md`
 - **M1211 RNA scored alone:** `rna_only_tm_score` / `rna_only_lddt` (model chain C vs native chain 0, OST `--lddt --tm-score`, the same as R1211).
   The R1211 native and the M1211 native RNA chain are the same coordinates (USalign TM 1.000, RMSD 0.00, 90 nt, 1904 atoms),
   so `results/tables/rna_alone_vs_complex.csv` isolates the effect of context.
+- **Top-ranked uses each method's full-precision score** (fixed 2026-11-17). AF3 per-sample `summary_confidences.json`
+  rounds `ranking_score` to 2 decimals, which tie (T1206 and L4001: all 25), so `collect_runs.py` reads AF3's
+  `ranking_scores.csv` instead (rounded value kept as `ranking_score_json_rounded`). Before the fix AF3's top-ranked pick
+  was wrong for T1206, R1211, L2001, L4001. Boltz-2 `confidence_score` and AF2-M scores had no ties.
 - `results/tables/summary.csv` gives per target × method: mean, median, top-ranked (by the method's own ranking_score / confidence_score) and best-of-25.
 
 ## Part 1 diagnostics (2026-11-16) — in `results/tables/diagnostics/`, never in benchmark tables
