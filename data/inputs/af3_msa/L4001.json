@@ -1,0 +1,29 @@
+{
+  "name": "L4001",
+  "modelSeeds": [
+    1
+  ],
+  "dialect": "alphafold3",
+  "version": 2,
+  "sequences": [
+    {
+      "protein": {
+        "id": [
+          "A",
+          "B"
+        ],
+        "sequence": "SGFRKMAFPSGKVEGCMVQVTCGTTTLNGLWLDDVVYCPRHVICTSEDMLNPNYEDLLIRKSNHNFLVQAGNVQLRVIGHSMQNCVLKLKVDTANPKTPKYKFVRIQPGQTFSVLACYNGSPSGVYQCAMRPNFTIKGSFLNGSCGSVGFNIDYDCVSFCYMHHMELPTGVHAGTDLEGNFYGPFVDRQTAQAAGTDTTITVNVLAWLYAAVINGDRWFLNRFTTTLNDFNLVAMKYNYEPLTQDHVDILGPLSAQTGIAVLDMCASLKELLQNGMNGRTILGSALLEDEFTPFDVVRQCSGVTFQ",
+        "templates": []
+      }
+    },
+    {
+      "ligand": {
+        "id": [
+          "L",
+          "M"
+        ],
+        "smiles": "O=C(Cn1ccnn1)Nc1ccc(Br)c([N+](=O)[O-])c1"
+      }
+    }
+  ]
+}

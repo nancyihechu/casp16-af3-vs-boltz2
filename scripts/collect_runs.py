@@ -71,7 +71,7 @@ def af3_rows():
             sc = json.load(open(sd / "summary_confidences.json"))
             conf = json.load(open(sd / "confidences.json"))
             yield dict(target=t, method="af3", seed=seed, sample=k, path=str(sd / "model.cif"),
-                       run_rc=tm.get("rc"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
+                       run_rc=tm.get("rc"), run_job_id=tm.get("job_id"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
                        chains=chains_of(str(sd / "model.cif")),
                        ptm=sc.get("ptm"), iptm=sc.get("iptm"), ranking_score=sc.get("ranking_score"),
                        plddt_mean=round(float(np.mean(conf["atom_plddts"])), 2),
@@ -88,7 +88,7 @@ def boltz_rows():
             k = int(cif.stem.rsplit("_", 1)[1])
             c = json.load(open(pdir / f"confidence_{t}_model_{k}.json"))
             yield dict(target=t, method="boltz2", seed=seed, sample=k, path=str(cif),
-                       run_rc=tm.get("rc"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
+                       run_rc=tm.get("rc"), run_job_id=tm.get("job_id"), run_wall_s=tm.get("wall_s"), run_inference_s=tm.get("inference_s"),
                        chains=chains_of(str(cif)),
                        ptm=c.get("ptm"), iptm=c.get("iptm"), confidence_score=c.get("confidence_score"),
                        plddt_mean=round(100 * c["complex_plddt"], 2) if "complex_plddt" in c else None,
@@ -119,7 +119,7 @@ def af2m_rows():
             pdb = Path(str(js).replace("_scores_", "_unrelaxed_").replace(".json", ".pdb"))
             sc = json.load(open(js))
             yield dict(target=t, method="af2m", seed=seed, sample=model - 1, path=str(pdb),
-                       run_rc=tm.get("rc"), run_wall_s=tm.get("wall_s"), run_inference_s=round(inf[seed], 1),
+                       run_rc=tm.get("rc"), run_job_id=tm.get("job_id"), run_wall_s=tm.get("wall_s"), run_inference_s=round(inf[seed], 1),
                        seeds_in_job=n_in_job,
                        chains=chains_of(str(pdb)), ptm=sc.get("ptm"), iptm=sc.get("iptm"),
                        ranking_score=round(0.8 * sc["iptm"] + 0.2 * sc["ptm"], 4),
@@ -132,7 +132,7 @@ def main():
     for r in rows:
         r["msa_s"], r["msa_source"] = mt.get((r["target"], r["method"]), ("", ""))
         r.setdefault("seeds_in_job", 1)
-    cols = ["target", "method", "seed", "sample", "path", "run_rc", "run_wall_s", "seeds_in_job", "run_inference_s",
+    cols = ["target", "method", "seed", "sample", "path", "run_job_id", "run_rc", "run_wall_s", "seeds_in_job", "run_inference_s",
             "msa_s", "msa_source", "chains", "ptm", "iptm", "ranking_score", "confidence_score",
             "plddt_mean", "complex_iplddt", "ligand_iptm", "protein_iptm", "has_clash",
             "fraction_disordered", "chain_pair_iptm"]

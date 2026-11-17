@@ -8,9 +8,12 @@ so `boltz predict` skips MSA generation for every seed.
 
 Boltz builds no MSA for RNA/DNA/ligands (it sets msa_id=-1 for non-protein chains).
 
-Run with envs/boltz2/bin/python -I scripts/boltz_msa.py  (needs outbound network).
+Run with envs/boltz2/bin/python -I scripts/boltz_msa.py [TARGET ...]  (needs outbound network).
+With target names, only those targets are run and their rows are APPENDED to the timing file;
+existing MSAs and timing rows are never overwritten.
 """
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -22,9 +25,15 @@ OUT.mkdir(parents=True, exist_ok=True)
 ents = json.load(open(ROOT / "data/inputs/boltz_msa_entities.json"))
 URL, PAIRING = "https://api.colabfold.com", "greedy"  # boltz predict defaults
 
-with open(ROOT / "msas" / "msa_timing_boltz.tsv", "w") as tsv:
-    tsv.write("target\tmethod\tn_protein_entities\tmsa_s\tdepths\n")
+only = sys.argv[1:]
+tfile = ROOT / "msas" / "msa_timing_boltz.tsv"
+with open(tfile, "a" if only else "w") as tsv:
+    if not only:
+        tsv.write("target\tmethod\tn_protein_entities\tmsa_s\tdepths\n")
     for t, seqs in ents.items():
+        if only and t not in only:
+            continue
+        assert not (OUT / f"{t}_0.csv").exists(), f"{t}: cached MSA exists; refusing to overwrite"
         if not seqs:
             tsv.write(f"{t}\tboltz2\t0\t0\tno protein entity (no MSA in Boltz)\n")
             print(t, "no protein entities; skipped")

@@ -1,0 +1,6 @@
+target,source,chain,molecule,n_residues,sequence,residue_numbers,strandedness
+M1276,native (Targets_hybrid_processed/M1276.pdb),A,protein,194,,,
+M1276,native (Targets_hybrid_processed/M1276.pdb),0,DNA,8,AGTCAGTC,10-17 (contiguous),single-stranded (1 DNA chain; no second strand present)
+M1276,predicted (targets.json; CASP A1B1),A,protein,196,,,
+M1276,predicted (targets.json; CASP A1B1),B,DNA,33,GAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTC,1-33,single-stranded (1 DNA chain)
+M1276,check,,,,,,"MATCH: native DNA = 1 strand, positions 10-17 of the predicted 33-mer; interface scores valid"

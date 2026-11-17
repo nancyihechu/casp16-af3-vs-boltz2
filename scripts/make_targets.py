@@ -40,11 +40,15 @@ def entries(path, target_id):
     return [s for h, s in read_fasta(path) if h.split()[0] == target_id]
 
 
-def smiles_from_tar(tar_path, member):
+def smiles_from_tar(tar_path, member, copies=1):
+    """Return (name, SMILES) from an official CASP SMILES .tsv. `copies` = expected number of
+    rows; multi-copy files (e.g. one ligand per protomer of a homodimer) must list the SAME
+    ligand name and SMILES in every row, otherwise this fails rather than guessing."""
     with tarfile.open(tar_path) as tf:
         text = tf.extractfile(member).read().decode()
     rows = list(csv.DictReader(io.StringIO(text), delimiter="\t"))
-    assert len(rows) == 1, f"{member}: expected 1 ligand row, got {len(rows)}"
+    assert len(rows) == copies, f"{member}: expected {copies} ligand row(s), got {len(rows)}"
+    assert len({(r["Name"], r["SMILES"]) for r in rows}) == 1, f"{member}: rows are not identical copies"
     return rows[0]["Name"], rows[0]["SMILES"]
 
 
@@ -68,10 +72,14 @@ m1211_prot, m1211_rna = entries(RDM, "M1211")
 m1276_prot, m1276_dna = entries(RDM, "M1276")
 (chymase_pre,) = entries(DL / "L1000.targetpage.seq.txt", "L1000")
 (catg_pre,) = entries(DL / "L2000.targetpage.seq.txt", "L2000")
+(mpro,) = entries(DL / "L4000.targetpage.seq.txt", "L4000")  # mature Mpro, 306 aa; no trimming
 assert m1211_rna == r1211
 
 lig1002 = smiles_from_tar(TGT / "L1000.SMILES.tar.gz", "L1000/L1002.tsv")
 lig2001 = smiles_from_tar(DL / "L2000.SMILES.tar.gz", "L2000/L2001.tsv")
+# L4001 (SARS-CoV-2 Mpro, set L4000): CASP README states the structure is a homodimer; the
+# official SMILES file lists 2 identical LIG rows (one per protomer) -> A2 + 2 ligand copies.
+lig4001 = smiles_from_tar(TGT / "L4000.SMILES.tar.gz", "L4000/L4001.tsv", copies=2)
 
 # chains: list of {type, ids, sequence|smiles}. ids are the chain ids used in every method's input.
 targets = {
@@ -96,6 +104,10 @@ targets = {
               "chains": [{"type": "protein", "ids": ["A"], "sequence": mature_from_IIGG(catg_pre),
                           "note": "cathepsin G, mature chain from IIGG (precursor 255 aa from CASP L2000 page)"},
                          {"type": "ligand", "ids": ["L"], "smiles": lig2001[1], "ligand_name": lig2001[0]}]},
+    "L4001": {"type": "protein-ligand", "stoich": "A2 + 2 LIG",
+              "chains": [{"type": "protein", "ids": ["A", "B"], "sequence": mpro,
+                          "note": "SARS-CoV-2 Mpro homodimer (CASP L4000 README); sequence from CASP L4000 page, 306 aa"},
+                         {"type": "ligand", "ids": ["L", "M"], "smiles": lig4001[1], "ligand_name": lig4001[0]}]},
 }
 
 out = TGT / "targets.json"

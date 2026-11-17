@@ -132,5 +132,29 @@
         "ligand_name": "761"
       }
     ]
+  },
+  "L4001": {
+    "type": "protein-ligand",
+    "stoich": "A2 + 2 LIG",
+    "chains": [
+      {
+        "type": "protein",
+        "ids": [
+          "A",
+          "B"
+        ],
+        "sequence": "SGFRKMAFPSGKVEGCMVQVTCGTTTLNGLWLDDVVYCPRHVICTSEDMLNPNYEDLLIRKSNHNFLVQAGNVQLRVIGHSMQNCVLKLKVDTANPKTPKYKFVRIQPGQTFSVLACYNGSPSGVYQCAMRPNFTIKGSFLNGSCGSVGFNIDYDCVSFCYMHHMELPTGVHAGTDLEGNFYGPFVDRQTAQAAGTDTTITVNVLAWLYAAVINGDRWFLNRFTTTLNDFNLVAMKYNYEPLTQDHVDILGPLSAQTGIAVLDMCASLKELLQNGMNGRTILGSALLEDEFTPFDVVRQCSGVTFQ",
+        "note": "SARS-CoV-2 Mpro homodimer (CASP L4000 README); sequence from CASP L4000 page, 306 aa"
+      },
+      {
+        "type": "ligand",
+        "ids": [
+          "L",
+          "M"
+        ],
+        "smiles": "O=C(Cn1ccnn1)Nc1ccc(Br)c([N+](=O)[O-])c1",
+        "ligand_name": "LIG"
+      }
+    ]
   }
 }

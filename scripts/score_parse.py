@@ -21,6 +21,16 @@ Metrics
   protein-ligand (L1002, L2001; OST compare-ligand-structures + PoseBusters dock mode):
     bisyrmsd, lddt_pli, lddt_lp, bb_rmsd, pb_valid (1 = every PoseBusters check passed),
     pb_n_failed, success (1 = bisyrmsd < 2 A AND pb_valid)  <- HEADLINE
+  added in part 3 (2026-11-16):
+    T1206/H1215: fnat (single interface, from the DockQ output)
+    M1211/M1276: ics[<r1>-<r2>], ilddt[<r1>-<r2>] per protein-NA interface, and
+      ics_protein_na_mean, ilddt_protein_na_mean (same restriction as dockq_protein_na_mean;
+      ilddt from scripts/score_na_interfaces.py)
+    ligands: plif_recovery, plif_n_native, plif_n_recovered (scripts/score_prolif.py)
+    L4001 (2 ligand copies): per-copy bisyrmsd/lddt_pli/pb_valid/success[ligand0|1];
+      bisyrmsd and lddt_pli = mean over assigned copies; pb_valid = all copies valid;
+      success = 1 only if EVERY reference copy is placed < 2 A and PB-valid;
+      success_fraction_copies; ligand_unassigned = number of unassigned reference copies
   failures: scoring_failed = 1 (raw error in predictions/scoring_work/out/<tag>.err);
             ligand_unassigned = 1 if OST could not assign the model ligand.
 """
@@ -42,7 +52,7 @@ def mean(xs):
     return sum(xs) / len(xs) if xs else None
 
 
-def polymer_metrics(t, tag):
+def polymer_metrics(t, tag):  # noqa: C901
     d = json.load(open(OUT / f"{tag}.ost.json"))
     if d.get("status") != "SUCCESS":
         return {"scoring_failed": 1}
@@ -60,6 +70,7 @@ def polymer_metrics(t, tag):
     if t in PP:
         if len(ints) == 1:
             m["dockq"], m["irmsd"] = dq[0], ir[0]
+            m["fnat"] = fn[0]  # 3a: fraction of native contacts, from the DockQ output
         else:
             m["dockq"], m["irmsd"] = None, None  # should not happen for a dimer; left blank
         us = OUT / f"{tag}.usalign.txt"
@@ -71,33 +82,91 @@ def polymer_metrics(t, tag):
         m["dockq_protein_na_mean"] = mean(na_dq)
         m["irmsd_protein_na_mean"] = mean(na_ir)
         m["n_protein_na_interfaces"] = len(na_dq)
+        # 3b: ICS and interface lDDT, restricted to protein-NA interfaces like dockq_protein_na_mean
+        na_ics, na_il = [], []
+        for (r1, r2), ics in zip(d.get("contact_reference_interfaces") or [], d.get("per_interface_ics") or []):
+            if (r1 in NA_REF_CHAINS[t]) == (r2 in NA_REF_CHAINS[t]):
+                continue
+            m[f"ics[{r1}-{r2}]"] = ics
+            na_ics.append(ics)
+            f = OUT / f"{tag}.naiface_{r1}-{r2}.json"
+            j = json.load(open(f)) if f.exists() else {}
+            il = j.get("ilddt") if j.get("status") == "SUCCESS" else None
+            m[f"ilddt[{r1}-{r2}]"] = il
+            na_il.append(il)
+        m["ics_protein_na_mean"] = mean(na_ics)
+        m["ilddt_protein_na_mean"] = mean(na_il) if None not in na_il else None
     return m
 
 
-def ligand_metrics(tag):
+def pb_rows(tag):
+    pb = OUT / f"{tag}.posebusters.csv"
+    rows = list(csv.DictReader(open(pb))) if pb.exists() else []
+    out = {}
+    for r in rows:
+        checks = {k: v for k, v in r.items() if v in ("True", "False")}
+        out[r.get("file")] = [k for k, v in checks.items() if v == "False"]
+    return out
+
+
+def prolif_metrics(tag):
+    f = OUT / f"{tag}.prolif.json"
+    if not f.exists():
+        return {}
+    d = json.load(open(f))
+    return {"plif_recovery": d["recovery"], "plif_n_native": d["n_native"], "plif_n_recovered": d["n_recovered"]}
+
+
+def ligand_metrics(tag, n_ref_ligands):
     m = {}
     d = json.load(open(OUT / f"{tag}.ostlig.json"))
     if d.get("status") != "SUCCESS":
         return {"scoring_failed": 1}
     r = d.get("rmsd", {}).get("assigned_scores", [])
     lp = d.get("lddt_pli", {}).get("assigned_scores", [])
-    if not r:
-        m["ligand_unassigned"] = 1
-    else:
-        m["bisyrmsd"], m["lddt_lp"], m["bb_rmsd"] = r[0]["score"], r[0].get("lddt_lp"), r[0].get("bb_rmsd")
-    if lp:
-        m["lddt_pli"] = lp[0]["score"]
-    pb = OUT / f"{tag}.posebusters.csv"
-    rows = list(csv.DictReader(open(pb))) if pb.exists() else []
-    if rows:
-        checks = {k: v for k, v in rows[0].items() if v in ("True", "False")}
-        failed = [k for k, v in checks.items() if v == "False"]
-        m["pb_valid"] = int(not failed)
-        m["pb_n_failed"] = len(failed)
-        for k in failed:
-            m[f"pb_fail:{k}"] = 1
-    if "bisyrmsd" in m and "pb_valid" in m:
-        m["success"] = int(m["bisyrmsd"] < 2.0 and m["pb_valid"] == 1)
+    pbr = pb_rows(tag)
+    if n_ref_ligands == 1:  # L1002, L2001: unchanged definitions
+        if not r:
+            m["ligand_unassigned"] = 1
+        else:
+            m["bisyrmsd"], m["lddt_lp"], m["bb_rmsd"] = r[0]["score"], r[0].get("lddt_lp"), r[0].get("bb_rmsd")
+        if lp:
+            m["lddt_pli"] = lp[0]["score"]
+        if pbr:
+            failed = next(iter(pbr.values()))
+            m["pb_valid"] = int(not failed)
+            m["pb_n_failed"] = len(failed)
+            for k in failed:
+                m[f"pb_fail:{k}"] = 1
+        if "bisyrmsd" in m and "pb_valid" in m:
+            m["success"] = int(m["bisyrmsd"] < 2.0 and m["pb_valid"] == 1)
+    else:  # L4001: one row set per reference ligand copy + pooled values (see CLAUDE.md)
+        lp_by_ref = {x["reference_ligand"]: x["score"] for x in lp}
+        copy_ok, rmsds, plis, pbv = [], [], [], []
+        for x in r:
+            ref = Path(x["reference_ligand"]).stem.split("_")[-1]  # ligand0 / ligand1
+            failed = pbr.get(x["model_ligand"], None)
+            m[f"bisyrmsd[{ref}]"] = x["score"]
+            m[f"lddt_pli[{ref}]"] = lp_by_ref.get(x["reference_ligand"])
+            if failed is not None:
+                m[f"pb_valid[{ref}]"] = int(not failed)
+                for k in failed:
+                    m[f"pb_fail:{k}[{ref}]"] = 1
+            ok = int(x["score"] < 2.0 and failed is not None and not failed)
+            m[f"success[{ref}]"] = ok
+            copy_ok.append(ok)
+            rmsds.append(x["score"])
+            plis.append(lp_by_ref.get(x["reference_ligand"]))
+            pbv.append(failed is not None and not failed)
+        n_unassigned = n_ref_ligands - len(r)
+        m["ligand_unassigned"] = n_unassigned
+        copy_ok += [0] * n_unassigned
+        m["bisyrmsd"] = mean(rmsds)          # mean over ASSIGNED copies
+        m["lddt_pli"] = mean(plis)
+        m["pb_valid"] = int(len(pbv) == n_ref_ligands and all(pbv))
+        m["success"] = int(all(copy_ok))     # every reference copy placed < 2 A and PB-valid
+        m["success_fraction_copies"] = sum(copy_ok) / n_ref_ligands
+    m.update(prolif_metrics(tag))
     return m
 
 
@@ -110,7 +179,7 @@ def main():
         elif t["kind"] == "polymer":
             met = polymer_metrics(tg, tag)
         elif t["kind"] == "ligand":
-            met = ligand_metrics(tag)
+            met = ligand_metrics(tag, len(t["reference_ligand"].split(";")))
         elif t["kind"] == "rna_only":
             d = json.load(open(OUT / f"{tag}.ost.json"))
             met = ({"rna_only_tm_score": d.get("tm_score"), "rna_only_lddt": d.get("lddt")}

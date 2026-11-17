@@ -13,6 +13,8 @@ Per task (raw outputs go to predictions/scoring_work/out/<tag>.*):
            ligand metric). PoseBusters 0.6.5 in `dock` mode (predicted ligand + the model's own
            protein). Its redock-mode `rmsd_<=_2A` check is unusable here because model and
            reference are in different frames, so RMSD comes only from OST BiSyRMSD.
+Multi-ligand targets (L4001): ';'-separated ligand paths are passed as several -ml / -rl
+files to OST and several prediction files to PoseBusters (one CSV row per ligand copy).
 A failed scorer writes <tag>.err. It is never retried with different settings.
 """
 import csv
@@ -65,14 +67,14 @@ def score(t):
     elif t["kind"] == "ligand":
         js = OUT / f"{tag}.ostlig.json"
         if not js.exists():
-            rc, e = run(OST + ["compare-ligand-structures", "-m", t["model"], "-ml", t["model_ligand"],
-                               "-r", t["reference"], "-rl", t["reference_ligand"], "--lddt-pli", "--rmsd",
-                               "-o", str(js)])
+            rc, e = run(OST + ["compare-ligand-structures", "-m", t["model"], "-ml", *t["model_ligand"].split(";"),
+                               "-r", t["reference"], "-rl", *t["reference_ligand"].split(";"),
+                               "--lddt-pli", "--rmsd", "-o", str(js)])
             if rc:
                 errs.append(f"ost-ligand rc={rc}: {e}")
         pb = OUT / f"{tag}.posebusters.csv"
         if not pb.exists():
-            rc, e = run([BUST, t["model_ligand"], "-p", t["model"], "--outfmt", "csv"], pb)
+            rc, e = run([BUST, *t["model_ligand"].split(";"), "-p", t["model"], "--outfmt", "csv"], pb)
             if rc:
                 errs.append(f"posebusters rc={rc}: {e}")
     else:

@@ -17,6 +17,11 @@ with the same OST TM-score / lDDT as R1211 (task kind "rna_only").
 L2001 reference: CASP stoichiometry is A1, but the crystal ASU has 2 protein chains.
 We score against ONE chain: the protein chain closest to the reference ligand.
 
+L4001 (Mpro): CASP stoichiometry is a homodimer with one ligand per protomer, so the
+reference receptor is BOTH chains and there are 2 reference ligands (LIG_A_401, LIG_B_401)
+and 2 model ligands (model chains L and M). Multiple ligand paths are ';'-joined in tasks.tsv;
+OST assigns model to reference ligands itself.
+
 Output: scoring/tasks.tsv plus scoring/work/** (git-ignored with predictions/).
 """
 import csv
@@ -32,8 +37,12 @@ ROOT = Path(__file__).resolve().parent.parent
 NAT = ROOT / "data/targets/natives"
 WORK = ROOT / "predictions/scoring_work"
 TARGETS = json.load(open(ROOT / "data/targets/targets.json"))
-LIG = {"L1002": ("L1002_protein.pdb", "L1002_ligand_293.pdb"),
-       "L2001": ("L2001_protein.pdb", "L2001_ligand_761.pdb")}
+# target: (native protein, [native ligand files], receptor mode)
+#   closest_chain = the one protein chain nearest the ligand (CASP A1 targets)
+#   all           = every protein chain (CASP homodimer L4001)
+LIG = {"L1002": ("L1002_protein.pdb", ["L1002_ligand_293.pdb"], "closest_chain"),
+       "L2001": ("L2001_protein.pdb", ["L2001_ligand_761.pdb"], "closest_chain"),
+       "L4001": ("L4001_protein.pdb", ["L4001_ligand_LIG_A_401.pdb", "L4001_ligand_LIG_B_401.pdb"], "all")}
 NATIVE = {t: f"{t}.pdb" for t in ["T1206", "H1215", "M1211", "R1211", "M1276"]}
 
 
@@ -109,38 +118,55 @@ def main():
     tasks, failures = [], []
     # Reference ligand targets: SDF + single receptor chain
     ref = {}
-    for t, (prot, lig) in LIG.items():
-        smi = next(c["smiles"] for c in TARGETS[t]["chains"] if c["type"] == "ligand")
-        lig_atoms = heavy(load(NAT / lig).get_atoms())
-        rsdf = WORK / f"ref_{t}_ligand.sdf"
-        err = coords_to_sdf(lig_atoms, smi, rsdf)
-        assert err is None, f"reference ligand {t} failed: {err}"
+    for t, (prot, ligs, mode) in LIG.items():
+        if t not in TARGETS:
+            continue
+        lchain = next(c for c in TARGETS[t]["chains"] if c["type"] == "ligand")
+        smi = lchain["smiles"]
+        rsdfs, all_lc = [], []
+        for i, lig in enumerate(ligs):
+            lig_atoms = heavy(load(NAT / lig).get_atoms())
+            rsdf = WORK / (f"ref_{t}_ligand.sdf" if len(ligs) == 1 else f"ref_{t}_ligand{i}.sdf")
+            err = coords_to_sdf(lig_atoms, smi, rsdf)
+            assert err is None, f"reference ligand {t} {lig} failed: {err}"
+            rsdfs.append(str(rsdf))
+            all_lc += [xyz for _, xyz in lig_atoms]
         pm = load(NAT / prot)
-        lc = np.array([xyz for _, xyz in lig_atoms])
-        dist = {c.id: min(np.linalg.norm(np.array([a.coord for a in c.get_atoms()])[:, None] - lc[None], axis=2).min(), 1e9)
-                for c in pm}
-        chain = min(dist, key=dist.get)
-        rpdb = WORK / f"ref_{t}_receptor_chain{chain}.pdb"
-        write_pdb(pm, rpdb, {chain})
-        ref[t] = (rsdf, rpdb, smi)
-        print(f"{t}: reference receptor chain {chain} (min dist to ligand {dist})")
+        if mode == "closest_chain":
+            lc = np.array(all_lc)
+            dist = {c.id: min(np.linalg.norm(np.array([a.coord for a in c.get_atoms()])[:, None] - lc[None], axis=2).min(), 1e9)
+                    for c in pm}
+            chain = min(dist, key=dist.get)
+            rpdb = WORK / f"ref_{t}_receptor_chain{chain}.pdb"
+            write_pdb(pm, rpdb, {chain})
+            print(f"{t}: reference receptor chain {chain} (min dist to ligand {dist})")
+        else:
+            rpdb = WORK / f"ref_{t}_receptor_all.pdb"
+            write_pdb(pm, rpdb, None)
+            print(f"{t}: reference receptor = all protein chains {[c.id for c in pm]}; {len(ligs)} reference ligands")
+        prot_ids = {i for c in TARGETS[t]["chains"] if c["type"] == "protein" for i in c["ids"]}
+        ref[t] = (";".join(rsdfs), rpdb, smi, lchain["ids"], prot_ids)
 
     rna_ref = WORK / "ref_M1211_rna_chain0.pdb"
     for r in csv.DictReader(open(ROOT / "results/tables/manifest.csv")):
         t, m, s, k, path = r["target"], r["method"], r["seed"], r["sample"], r["path"]
         tag = f"{t}_{m}_s{s}_k{k}"
         if t in LIG:
-            rsdf, rpdb, smi = ref[t]
+            rsdf, rpdb, smi, lig_ids, prot_ids = ref[t]
             mdl = load(path)
-            lig_atoms = heavy(a for c in mdl for res in c if res.id[0] != " " or c.id == "L" for a in res)
-            msdf, mpdb = WORK / f"{tag}_ligand.sdf", WORK / f"{tag}_receptor.pdb"
-            write_pdb(mdl, mpdb, {"A"})
-            err = coords_to_sdf(lig_atoms, smi, msdf)
+            mpdb = WORK / f"{tag}_receptor.pdb"
+            write_pdb(mdl, mpdb, prot_ids)
+            msdfs, err = [], None
+            for lid in lig_ids:
+                lig_atoms = heavy(a for c in mdl if c.id == lid for res in c for a in res)
+                msdf = WORK / (f"{tag}_ligand.sdf" if len(lig_ids) == 1 else f"{tag}_ligand_{lid}.sdf")
+                err = err or (coords_to_sdf(lig_atoms, smi, msdf) if lig_atoms else f"no atoms in model chain {lid}")
+                msdfs.append(str(msdf))
             if err:
                 failures.append((tag, err))
                 tasks.append([tag, t, m, s, k, "ligand_FAILED_SDF", path, "", "", "", ""])
                 continue
-            tasks.append([tag, t, m, s, k, "ligand", str(mpdb), str(msdf), str(rpdb), str(rsdf), path])
+            tasks.append([tag, t, m, s, k, "ligand", str(mpdb), ";".join(msdfs), str(rpdb), rsdf, path])
         else:
             tasks.append([tag, t, m, s, k, "polymer", path, "", str(NAT / NATIVE[t]), "", ""])
             if t == "M1211":

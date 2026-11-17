@@ -19,12 +19,16 @@ timing.csv: one row per (target, method, seed) run.
     af2m:   sum of ColabFold's per-model "took Xs" lines for that seed (5 models; excludes startup/I/O)
   run_wall_s: the whole Slurm job. For af2m Stage C one job ran 4 seeds (seeds_in_job=4), so
     run_wall_s there covers 4 seeds; do not read it as per-seed.
-  stage: B_cold_start (seed 1; Boltz seed-1 runs except L2001 include one-time kernel compile)
+  partition / node / slurm_restarts: from sacct by job id. slurm_restarts > 0 means the job was
+    preempted and restarted (possible on gpu_requeue); its wall time then covers only the last attempt.
+  stage: D_added_2026-11-16 for L4001 (run on gpu_requeue in a later session);
+         B_cold_start (seed 1; Boltz seed-1 runs except L2001 include one-time kernel compile)
          or C_steady_state (seeds 2-5; warm caches). Use C for steady-state timing.
 
 confidence.csv: long format: target, method, seed, sample, metric, value.
 """
 import csv
+import subprocess
 from collections import defaultdict
 from pathlib import Path
 
@@ -55,6 +59,23 @@ INF_DEF = {"af3": "af3_model_inference_log", "boltz2": "per_seed_run_wall_msa_ca
            "af2m": "colabfold_sum_of_5_model_took_lines"}
 
 rows = list(csv.DictReader(open(T / "manifest.csv")))
+
+
+def slurm_info(job_ids):
+    """{job_id: (partition, node, restarts)}. This Slurm's sacct has no Restarts field, so
+    restarts = (number of allocation records with `sacct -D`, which keeps the records of
+    requeued attempts) - 1. Partition/node are those of the last attempt."""
+    ids = sorted({j for j in job_ids if j})
+    p = subprocess.run(["sacct", "-D", "-X", "-n", "-P", "-j", ",".join(ids), "--format=JobID,Partition,NodeList"],
+                       capture_output=True, text=True, check=True)
+    recs = defaultdict(list)
+    for line in p.stdout.splitlines():
+        j, part, node = line.split("|")
+        recs[j].append((part, node))
+    return {j: (r[-1][0], r[-1][1], str(len(r) - 1)) for j, r in recs.items()}
+
+
+SL = slurm_info(r.get("run_job_id") for r in rows)
 runs = {}
 for r in rows:
     k = (r["target"], r["method"], r["seed"])
@@ -62,11 +83,17 @@ for r in rows:
 with open(T / "timing.csv", "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["target", "method", "seed", "stage", "msa_source", "msa_s", "msa_s_scope", "inference_s",
-                "inference_s_definition", "run_wall_s", "seeds_in_job", "run_rc", "gpu"])
+                "inference_s_definition", "run_wall_s", "seeds_in_job", "run_rc", "gpu",
+                "run_job_id", "partition", "node", "slurm_restarts"])
     for (t, m, s), r in sorted(runs.items()):
-        stage = "B_cold_start" if s == "1" else "C_steady_state"
+        if t == "L4001":
+            stage = "D_added_2026-11-16"  # separate session, gpu_requeue, warm kernel caches
+        else:
+            stage = "B_cold_start" if s == "1" else "C_steady_state"
+        part, node, rst = SL.get(r.get("run_job_id"), ("", "", ""))
         w.writerow([t, m, s, stage, msa_source(t, m), r["msa_s"], "per_target_once", r["run_inference_s"],
-                    INF_DEF[m], r["run_wall_s"], r["seeds_in_job"], r["run_rc"], "L40S"])
+                    INF_DEF[m], r["run_wall_s"], r["seeds_in_job"], r["run_rc"], "L40S",
+                    r.get("run_job_id"), part, node, rst])
 
 CONF = ["ptm", "iptm", "ranking_score", "confidence_score", "plddt_mean", "complex_iplddt",
         "ligand_iptm", "protein_iptm", "has_clash", "fraction_disordered"]
