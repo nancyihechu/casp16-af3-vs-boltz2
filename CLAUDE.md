@@ -1,7 +1,7 @@
 # PROJECT4: CASP16 benchmark, AF3 vs AF2-Multimer vs Boltz-2
 
 Root: `/cluster/pixstor/dkhf3-lab/users/nancy/PROJECT4`
-Repo: `nancyihechu/casp16-af3-vs-boltz2` (private). GitHub CLI: `~/bin/gh`
+Repo: `nancyihechu/casp16-af3-vs-boltz2` (public since 2026-11-17; collaborators matthewmcfall13-alt, yw4814 with write). Commit as `108512259+nancyihechu@users.noreply.github.com` (set in this repo's git config). GitHub CLI: `~/bin/gh`
 Recon: `../PROJECT4_RECON.md`
 
 ## Rules (must hold everywhere)
