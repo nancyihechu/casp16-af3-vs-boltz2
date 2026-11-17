@@ -1,0 +1,11 @@
+target,method,n,iptm_definition,iptm_precision,mean_iptm,spearman_iptm_vs_dockq,spearman_ranking_score_vs_dockq,ranking_score_used,dockq_top_ranked,dockq_at_max_iptm,n_tied_at_max_iptm
+T1206,af3,25,global ipTM,2 decimals,0.93,,-0.4279,ranking_score,0.939,0.9362,25
+T1206,boltz2,25,global ipTM,full,0.935,-0.2814,0.092,confidence_score,0.889,0.866,1
+T1206,af2m,25,global ipTM,2 decimals,0.8856,0.1939,0.1755,ranking_score,0.93,0.93,1
+H1215,af3,25,global ipTM,2 decimals,0.1428,0.5832,0.6188,ranking_score,0.119,0.119,1
+H1215,boltz2,25,global ipTM,full,0.3793,0.4521,0.4725,confidence_score,0.008,0.034,1
+H1215,af2m,25,global ipTM,2 decimals,0.1972,-0.6611,-0.6735,ranking_score,0.019,0.019,1
+M1211,af3,25,"protein-RNA chain-pair ipTM, mean over pairs",2 decimals,0.3566,0.3366,0.3501,ranking_score,0.0155,0.0155,1
+M1211,boltz2,25,"protein-RNA chain-pair ipTM, mean over pairs",full,0.5446,0.6888,0.5535,confidence_score,0.024,0.029,1
+M1276,af3,25,global ipTM,2 decimals,0.2136,0.6025,0.6294,ranking_score,0.038,0.038,1
+M1276,boltz2,25,global ipTM,full,0.8557,-0.0736,-0.3037,confidence_score,0.03,0.035,1
